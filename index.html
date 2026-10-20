@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inventario · Nama Store y Compitas</title>
+<meta name="theme-color" content="#121121">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inventario">
+<meta name="robots" content="noindex">
+<link rel="apple-touch-icon" href="logo-nama.png">
+<link rel="icon" href="logo-nama.png">
+<style>
+  :root {
+    --tela: #ECEEF2; --blanco: #fff; --tinta: #121121; --tinta-2: #4A4B5C; --tinta-3: #7D7F8E; --linea: #D9DCE3;
+    --naranja: #F0891A; --naranja-osc: #B8620A; --vino: #450A0C; --oro: #FBAC28; --verde: #1F8A55;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 16px; line-height: 1.4; color: var(--tinta); background: var(--tela); font-variant-numeric: tabular-nums; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--naranja); outline-offset: 2px; }
+
+  header { background: var(--tinta); color: #fff; padding: calc(16px + env(safe-area-inset-top)) 16px 18px; }
+  .marcas { display: flex; gap: 8px; margin-bottom: 14px; }
+  .marcas img { width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 10px; padding: 3px; }
+  h1 { margin: 0; font-size: 26px; line-height: 1.1; letter-spacing: -.01em; }
+  .sub { color: #B7B9C9; font-size: 14px; margin-top: 6px; }
+
+  .filtros { position: sticky; top: 0; z-index: 5; background: var(--tela); padding: 12px 16px 10px; display: grid; gap: 10px; border-bottom: 1px solid var(--linea); }
+  .buscar { width: 100%; border: 1px solid var(--linea); border-radius: 12px; padding: 11px 14px; font: inherit; background: #fff; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { border: 1px solid var(--linea); background: #fff; border-radius: 999px; padding: 7px 14px; white-space: nowrap; font-weight: 600; font-size: 14px; }
+  .chip[aria-pressed="true"] { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+
+  main { padding: 14px 16px calc(110px + env(safe-area-inset-bottom)); max-width: 760px; margin: 0 auto; }
+  .tipo { margin: 18px 0 8px; font-size: 13px; font-weight: 700; color: var(--tinta-3); }
+  .tipo:first-child { margin-top: 4px; }
+  .prenda { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid #E2E5EB; }
+  .prenda-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .muestra { width: 34px; height: 34px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,.15); box-shadow: inset 0 0 0 3px #fff; }
+  .prenda-cab b { font-size: 17px; }
+  .prenda-cab small { display: block; color: var(--tinta-3); font-size: 13px; }
+  .tallas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .talla { position: relative; min-width: 64px; border: 1.5px solid var(--linea); background: #fff; border-radius: 12px; padding: 8px 10px; text-align: center; display: grid; gap: 1px; }
+  .talla b { font-size: 16px; }
+  .talla span { font-size: 12px; color: var(--tinta-3); }
+  .talla.elegida { border-color: var(--tinta); background: #F4F5F8; }
+  .talla .cuenta { position: absolute; top: -8px; right: -8px; background: var(--naranja); color: #fff; font-size: 12px; font-weight: 800; min-width: 22px; height: 22px; border-radius: 11px; display: grid; place-items: center; padding: 0 6px; }
+  .talla:disabled { opacity: .45; cursor: default; }
+  .vacio { text-align: center; color: var(--tinta-3); padding: 50px 16px; }
+
+  .barra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(236,238,242,.92); backdrop-filter: blur(8px); border-top: 1px solid var(--linea); }
+  .barra button { width: 100%; max-width: 728px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; border: 0; background: var(--tinta); color: #fff; border-radius: 14px; padding: 15px 18px; font-weight: 700; font-size: 16px; }
+  .barra button:disabled { background: #B9BECB; }
+  .barra .num { background: var(--naranja); border-radius: 999px; padding: 2px 10px; }
+
+  dialog { border: 0; padding: 0; width: 100vw; max-width: 760px; max-height: 90dvh; margin: auto auto 0; border-radius: 20px 20px 0 0; color: var(--tinta); }
+  dialog::backdrop { background: rgba(18,17,33,.5); }
+  .hoja { display: flex; flex-direction: column; max-height: 90dvh; }
+  .hoja header { background: none; color: var(--tinta); padding: 18px 18px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .hoja h2 { margin: 0; font-size: 20px; }
+  .cerrar { border: 0; background: var(--tela); width: 36px; height: 36px; border-radius: 50%; font-size: 20px; line-height: 1; }
+  .cuerpo { overflow-y: auto; padding: 4px 18px 8px; }
+  .linea { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #EEF0F3; }
+  .linea .crece { flex: 1; min-width: 0; }
+  .linea b { display: block; }
+  .linea small { color: var(--tinta-3); }
+  .paso { display: inline-flex; align-items: center; border: 1px solid var(--linea); border-radius: 10px; overflow: hidden; }
+  .paso button { border: 0; background: var(--tela); width: 38px; height: 38px; font-size: 20px; }
+  .paso span { min-width: 34px; text-align: center; font-weight: 700; }
+  label.campo { display: grid; gap: 6px; margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--tinta-2); }
+  label.campo input, label.campo textarea { border: 1px solid var(--linea); border-radius: 12px; padding: 11px 13px; font: inherit; font-weight: 400; color: var(--tinta); }
+  .pie { padding: 12px 18px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 8px; border-top: 1px solid #EEF0F3; }
+  .enviar { border: 0; background: var(--verde); color: #fff; border-radius: 14px; padding: 15px; font-weight: 800; font-size: 17px; }
+  .vaciar { border: 0; background: none; color: var(--tinta-3); text-decoration: underline; padding: 6px; }
+  .aviso { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--tinta); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 30; }
+  .aviso.ver { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="marcas"><img src="logo-nama.png" alt="Nama Store"><img src="logo-compitas.png" alt="Compitas"></div>
+  <h1 id="titulo">Inventario disponible</h1>
+  <div class="sub" id="actualizado">Cargando…</div>
+</header>
+<div class="filtros">
+  <input class="buscar" id="buscar" type="search" placeholder="Buscar color, talla o prenda" aria-label="Buscar">
+  <div class="chips" id="chips" role="group" aria-label="Tipo de prenda"></div>
+</div>
+<main id="lista" aria-live="polite"></main>
+<div class="barra"><button id="ver-carrito" disabled><span>Ver mi pedido</span><span class="num" id="total-piezas">0</span></button></div>
+
+<dialog id="carrito">
+  <div class="hoja">
+    <header><h2>Mi pedido</h2><button class="cerrar" id="cerrar" aria-label="Cerrar">×</button></header>
+    <div class="cuerpo">
+      <div id="lineas"></div>
+      <label class="campo">¿Quién pide? (opcional)<input id="quien" autocomplete="name" placeholder="Tu nombre"></label>
+      <label class="campo">Nota (opcional)<textarea id="nota" rows="2" placeholder="Para qué pedido es, fecha en que lo necesitas…"></textarea></label>
+    </div>
+    <div class="pie">
+      <button class="enviar" id="enviar">Enviar por WhatsApp</button>
+      <button class="vaciar" id="vaciar">Vaciar pedido</button>
+    </div>
+  </div>
+</dialog>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const COLORES = {
+  negro: "#151515", blanco: "#FFFFFF", gris: "#8E9199", "gris claro": "#C9CCD2", "gris oscuro": "#4B4E55", jaspe: "#B9BBC0",
+  azul: "#1F4FA3", "azul oscuro": "#14244A", "azul marino": "#14244A", navy: "#14244A", "azul cielo": "#8EC5EC", celeste: "#8EC5EC", turquesa: "#1BA8A6",
+  rojo: "#C62828", vinotinto: "#5E1220", vino: "#5E1220", rosado: "#F2A7C0", rosa: "#F2A7C0", fucsia: "#D81B7A", morado: "#6A3FA0", lila: "#B39DDB",
+  verde: "#2E7D32", "verde militar": "#4B5320", "verde oliva": "#6B7A2E", menta: "#A8E6CF", amarillo: "#F5C518", mostaza: "#D4A017", naranja: "#F0891A",
+  beige: "#E3D3B5", arena: "#D8C3A0", cafe: "#6D4C41", "café": "#6D4C41", camel: "#B48655", crema: "#F5EEDC", hueso: "#F1EADB",
+};
+const muestra = (color) => { const c = String(color || "").toLowerCase().trim(); return COLORES[c] || COLORES[c.split(" ")[0]] || "#D9DCE3"; };
+const leer = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (_) { return d; } };
+const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) { /* sin almacenamiento */ } };
+
+let datos = { prendas: [] };
+let carrito = leer("inventario.carrito", {});   // id -> cantidad
+let filtro = "";
+
+function avisar(t) { const a = $("#aviso"); a.textContent = t; a.classList.add("ver"); clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("ver"), 1600); }
+function nombre(p) { return [p.tipo, p.color, p.talla && `talla ${p.talla}`].filter(Boolean).join(" · "); }
+function cuando(iso) {
+  const d = new Date(iso); if (isNaN(d)) return "";
+  const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  let h = d.getHours(), m = String(d.getMinutes()).padStart(2, "0"), ap = h >= 12 ? "p. m." : "a. m."; h = h % 12 || 12;
+  return `${d.getDate()} ${meses[d.getMonth()]}, ${h}:${m} ${ap}`;
+}
+
+function pintar() {
+  const q = $("#buscar").value.toLowerCase().trim();
+  const visibles = datos.prendas.filter((p) => (!filtro || p.tipo === filtro) && (!q || nombre(p).toLowerCase().includes(q) || (p.notas || "").toLowerCase().includes(q)));
+  // agrupa por tipo y color
+  const grupos = new Map();
+  for (const p of visibles) {
+    const k = `${p.tipo}|${p.color}`;
+    if (!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(p);
+  }
+  let html = "", tipoActual = null;
+  for (const [k, ps] of grupos) {
+    const [tipo, color] = k.split("|");
+    if (tipo !== tipoActual) { html += `<div class="tipo">${esc(tipo)}</div>`; tipoActual = tipo; }
+    const notas = [...new Set(ps.map((p) => p.notas).filter(Boolean))].join(" · ");
+    html += `<section class="prenda"><div class="prenda-cab"><span class="muestra" style="background:${muestra(color)}"></span>
+      <div><b>${esc(tipo)}${color ? ` ${esc(color)}` : ""}</b>${notas ? `<small>${esc(notas)}</small>` : ""}</div></div>
+      <div class="tallas">${ps.map((p) => {
+        const n = carrito[p.id] || 0;
+        return `<button class="talla ${n ? "elegida" : ""}" data-id="${p.id}" ${p.disponible ? "" : "disabled"} aria-label="Agregar ${esc(nombre(p))}">
+          <b>${esc(p.talla || "Única")}</b><span>${p.disponible ? (datos.mostrar_cantidades ? `${p.disponible} disp.` : "Disponible") : "Agotada"}</span>
+          ${n ? `<span class="cuenta">${n}</span>` : ""}</button>`;
+      }).join("")}</div></section>`;
+  }
+  $("#lista").innerHTML = html || `<p class="vacio">${datos.prendas.length ? "No hay prendas con ese filtro." : "No hay prendas disponibles en este momento."}</p>`;
+  const total = Object.values(carrito).reduce((a, b) => a + b, 0);
+  $("#total-piezas").textContent = total;
+  $("#ver-carrito").disabled = !total;
+}
+
+function pintarChips() {
+  const tipos = [...new Set(datos.prendas.map((p) => p.tipo))];
+  $("#chips").innerHTML = ["", ...tipos].map((t) => `<button class="chip" data-tipo="${esc(t)}" aria-pressed="${filtro === t}">${t ? esc(t) : "Todo"}</button>`).join("");
+}
+
+function pintarCarrito() {
+  const ids = Object.keys(carrito).filter((id) => carrito[id] > 0);
+  $("#lineas").innerHTML = ids.map((id) => {
+    const p = datos.prendas.find((x) => String(x.id) === id);
+    if (!p) return "";
+    return `<div class="linea"><span class="muestra" style="background:${muestra(p.color)};width:26px;height:26px"></span>
+      <div class="crece"><b>${esc([p.tipo, p.color].filter(Boolean).join(" "))}</b><small>Talla ${esc(p.talla || "única")}${datos.mostrar_cantidades ? ` · hay ${p.disponible}` : ""}</small></div>
+      <div class="paso"><button data-menos="${id}" aria-label="Menos">−</button><span>${carrito[id]}</span><button data-mas="${id}" aria-label="Más">+</button></div></div>`;
+  }).join("") || `<p class="vacio" style="padding:24px 0">Tu pedido está vacío.</p>`;
+}
+
+function cambiar(id, d) {
+  const p = datos.prendas.find((x) => String(x.id) === String(id));
+  if (!p) return;
+  const n = Math.max(0, Math.min(p.disponible, (carrito[id] || 0) + d));
+  if (d > 0 && n === (carrito[id] || 0)) avisar(`Solo hay ${p.disponible} de esta talla`);
+  if (n) carrito[id] = n; else delete carrito[id];
+  guardar("inventario.carrito", carrito);
+  pintar();
+  if ($("#carrito").open) pintarCarrito();
+}
+
+function mensaje() {
+  const ids = Object.keys(carrito).filter((id) => carrito[id] > 0);
+  const lineas = ids.map((id) => { const p = datos.prendas.find((x) => String(x.id) === id); return p ? `• ${carrito[id]} × ${nombre(p)}` : null; }).filter(Boolean);
+  const total = ids.reduce((a, id) => a + carrito[id], 0);
+  const quien = $("#quien").value.trim(), nota = $("#nota").value.trim();
+  return [
+    `Hola, necesito estas prendas del inventario${quien ? ` (pide ${quien})` : ""}:`, "",
+    ...lineas, "",
+    `Total: ${total} prenda${total === 1 ? "" : "s"}`,
+    nota ? `Nota: ${nota}` : null,
+    `Inventario del ${cuando(datos.actualizado)}`,
+  ].filter((x) => x !== null).join("\n");
+}
+
+async function cargar() {
+  try {
+    const r = await fetch(`inventario.json?t=${Date.now()}`, { cache: "no-store" });
+    datos = await r.json();
+  } catch (_) {
+    $("#lista").innerHTML = `<p class="vacio">No se pudo cargar el inventario. Revisa tu conexión y recarga la página.</p>`;
+    return;
+  }
+  $("#titulo").textContent = datos.titulo || "Inventario disponible";
+  $("#actualizado").textContent = `Actualizado el ${cuando(datos.actualizado)} · ${datos.prendas.reduce((a, p) => a + p.disponible, 0)} prendas disponibles`;
+  // limpia del carrito lo que ya no existe o supera lo disponible
+  for (const id of Object.keys(carrito)) {
+    const p = datos.prendas.find((x) => String(x.id) === id);
+    if (!p || !p.disponible) delete carrito[id]; else carrito[id] = Math.min(carrito[id], p.disponible);
+  }
+  guardar("inventario.carrito", carrito);
+  try { $("#quien").value = leer("inventario.quien", ""); } catch (_) { /* nada */ }
+  pintarChips(); pintar();
+}
+
+$("#lista").addEventListener("click", (e) => { const b = e.target.closest(".talla"); if (b && !b.disabled) cambiar(b.dataset.id, +1); });
+$("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; filtro = b.dataset.tipo; pintarChips(); pintar(); });
+$("#buscar").addEventListener("input", pintar);
+$("#ver-carrito").addEventListener("click", () => { pintarCarrito(); $("#carrito").showModal(); });
+$("#cerrar").addEventListener("click", () => $("#carrito").close());
+$("#carrito").addEventListener("click", (e) => {
+  if (e.target === $("#carrito")) $("#carrito").close();
+  if (e.target.dataset.mas) cambiar(e.target.dataset.mas, +1);
+  if (e.target.dataset.menos) cambiar(e.target.dataset.menos, -1);
+});
+$("#vaciar").addEventListener("click", () => { carrito = {}; guardar("inventario.carrito", carrito); pintar(); pintarCarrito(); });
+$("#enviar").addEventListener("click", () => {
+  if (!Object.keys(carrito).length) { avisar("Agrega al menos una prenda"); return; }
+  if (!datos.whatsapp) { avisar("Falta configurar el número de WhatsApp"); return; }
+  guardar("inventario.quien", $("#quien").value.trim());
+  window.open(`https://wa.me/${datos.whatsapp}?text=${encodeURIComponent(mensaje())}`, "_blank");
+});
+cargar();
+</script>
+</body>
+</html>
