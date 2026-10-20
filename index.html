@@ -120,6 +120,7 @@
 
 <script>
 "use strict";
+const PAGINA = "__PAGINA__";
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const COLORES = {
@@ -163,7 +164,7 @@ function pintar() {
     const notas = [...new Set(ps.map((p) => p.notas).filter(Boolean))].join(" · ");
     const conFoto = ps.find((p) => p.foto);
     html += `<section class="prenda"><div class="prenda-cab">${conFoto
-      ? `<button class="foto-prenda" data-grande="${esc(conFoto.foto_grande || conFoto.foto)}" aria-label="Ver foto"><img src="${esc(conFoto.foto)}" alt="" loading="lazy">${color ? `<span class="muestra" style="background:${muestra(color)}"></span>` : ""}</button>`
+      ? `<button class="foto-prenda" data-grande="${esc(conFoto.foto_grande || conFoto.foto)}" aria-label="Ver foto"><img src="${esc(conFoto.foto)}" alt="" decoding="async" onerror="this.remove()">${color ? `<span class="muestra" style="background:${muestra(color)}"></span>` : ""}</button>`
       : `<span class="muestra" style="background:${muestra(color)}"></span>`}
       <div><b>${esc(tipo)}${color ? ` ${esc(color)}` : ""}</b>${notas ? `<small>${esc(notas)}</small>` : ""}</div></div>
       <div class="tallas">${ps.map((p) => {
@@ -227,6 +228,15 @@ async function cargar() {
   } catch (_) {
     $("#lista").innerHTML = `<p class="vacio">No se pudo cargar el inventario. Revisa tu conexión y recarga la página.</p>`;
     return;
+  }
+  // Si el celular guardó una página vieja del catálogo, se recarga con la nueva (una sola vez)
+  if (datos.pagina && datos.pagina !== PAGINA) {
+    let ya = null; try { ya = sessionStorage.getItem("catalogo.recarga"); } catch (_) { /* nada */ }
+    if (ya !== datos.pagina) {
+      try { sessionStorage.setItem("catalogo.recarga", datos.pagina); } catch (_) { /* nada */ }
+      location.replace(`${location.pathname}?v=${datos.pagina}`);
+      return;
+    }
   }
   $("#titulo").textContent = datos.titulo || "Inventario disponible";
   $("#actualizado").textContent = `Actualizado el ${cuando(datos.actualizado)} · ${datos.prendas.reduce((a, p) => a + p.disponible, 0)} prendas disponibles`;
