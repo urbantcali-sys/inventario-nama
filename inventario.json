@@ -1,0 +1,24 @@
+{
+ "titulo": "Inventario disponible",
+ "whatsapp": "573145741536",
+ "mostrar_cantidades": true,
+ "actualizado": "2026-10-20T10:53",
+ "prendas": [
+  {
+   "id": 1,
+   "tipo": "Camiseta",
+   "color": "Negro",
+   "talla": "M",
+   "notas": "Oversice",
+   "disponible": 3
+  },
+  {
+   "id": 2,
+   "tipo": "Camiseta",
+   "color": "Negro",
+   "talla": "L",
+   "notas": "Oversice",
+   "disponible": 3
+  }
+ ]
+}
