@@ -41,6 +41,12 @@
   .tipo:first-child { margin-top: 4px; }
   .prenda { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid #E2E5EB; }
   .prenda-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .foto-prenda { width: 64px; height: 64px; flex: none; border: 0; padding: 0; border-radius: 12px; overflow: hidden; background: #ECEEF2; cursor: zoom-in; position: relative; }
+  .foto-prenda img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto-prenda .muestra { position: absolute; right: 3px; bottom: 3px; width: 16px; height: 16px; box-shadow: inset 0 0 0 2px #fff; }
+  #visor { background: #121121; max-width: 760px; border-radius: 20px 20px 0 0; }
+  #visor img { width: 100%; max-height: 80dvh; object-fit: contain; display: block; }
+  #visor button { position: absolute; top: 10px; right: 10px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,255,255,.9); font-size: 22px; cursor: pointer; }
   .muestra { width: 34px; height: 34px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,.15); box-shadow: inset 0 0 0 3px #fff; }
   .prenda-cab b { font-size: 17px; }
   .prenda-cab small { display: block; color: var(--tinta-3); font-size: 13px; }
@@ -95,6 +101,7 @@
 <main id="lista" aria-live="polite"></main>
 <div class="barra"><button id="ver-carrito" disabled><span>Ver mi pedido</span><span class="num" id="total-piezas">0</span></button></div>
 
+<dialog id="visor"><button type="button" aria-label="Cerrar">×</button><img alt=""></dialog>
 <dialog id="carrito">
   <div class="hoja">
     <header><h2>Mi pedido</h2><button class="cerrar" id="cerrar" aria-label="Cerrar">×</button></header>
@@ -154,7 +161,10 @@ function pintar() {
     const [tipo, color] = k.split("|");
     if (tipo !== tipoActual) { html += `<div class="tipo">${esc(tipo)}</div>`; tipoActual = tipo; }
     const notas = [...new Set(ps.map((p) => p.notas).filter(Boolean))].join(" · ");
-    html += `<section class="prenda"><div class="prenda-cab"><span class="muestra" style="background:${muestra(color)}"></span>
+    const conFoto = ps.find((p) => p.foto);
+    html += `<section class="prenda"><div class="prenda-cab">${conFoto
+      ? `<button class="foto-prenda" data-grande="${esc(conFoto.foto_grande || conFoto.foto)}" aria-label="Ver foto"><img src="${esc(conFoto.foto)}" alt="" loading="lazy">${color ? `<span class="muestra" style="background:${muestra(color)}"></span>` : ""}</button>`
+      : `<span class="muestra" style="background:${muestra(color)}"></span>`}
       <div><b>${esc(tipo)}${color ? ` ${esc(color)}` : ""}</b>${notas ? `<small>${esc(notas)}</small>` : ""}</div></div>
       <div class="tallas">${ps.map((p) => {
         const n = carrito[p.id] || 0;
@@ -202,7 +212,7 @@ function mensaje() {
   const total = ids.reduce((a, id) => a + carrito[id], 0);
   const quien = $("#quien").value.trim(), nota = $("#nota").value.trim();
   return [
-    `Hola, necesito estas prendas del inventario${quien ? ` (pide ${quien})` : ""}:`, "",
+    `${(datos.encabezado || "Hola, necesito estas prendas del inventario").replace(/\{quien\}/g, quien || "").replace(/[\s:]+$/, "")}${quien && !/\{quien\}/.test(datos.encabezado || "") ? ` (pide ${quien})` : ""}:`, "",
     ...lineas, "",
     `Total: ${total} prenda${total === 1 ? "" : "s"}`,
     nota ? `Nota: ${nota}` : null,
@@ -230,7 +240,12 @@ async function cargar() {
   pintarChips(); pintar();
 }
 
-$("#lista").addEventListener("click", (e) => { const b = e.target.closest(".talla"); if (b && !b.disabled) cambiar(b.dataset.id, +1); });
+$("#lista").addEventListener("click", (e) => {
+  const f = e.target.closest(".foto-prenda");
+  if (f) { $("#visor img").src = f.dataset.grande; $("#visor").showModal(); return; }
+  const b = e.target.closest(".talla"); if (b && !b.disabled) cambiar(b.dataset.id, +1);
+});
+$("#visor").addEventListener("click", () => $("#visor").close());
 $("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; filtro = b.dataset.tipo; pintarChips(); pintar(); });
 $("#buscar").addEventListener("input", pintar);
 $("#ver-carrito").addEventListener("click", () => { pintarCarrito(); $("#carrito").showModal(); });
