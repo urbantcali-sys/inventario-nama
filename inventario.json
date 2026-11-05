@@ -2,38 +2,8 @@
  "titulo": "Inventario disponible",
  "whatsapp": "573145741536",
  "mostrar_cantidades": true,
- "actualizado": "2026-10-20T12:16",
+ "actualizado": "2026-11-05T00:35",
  "encabezado": "Hola, necesito estas prendas del inventario",
- "prendas": [
-  {
-   "id": 1,
-   "tipo": "Camisa",
-   "color": "Negro",
-   "talla": "M",
-   "notas": "Oversize",
-   "disponible": 3,
-   "foto": "fotos/f560e4200faa4a57a0166b00a2d2578f_m.jpg",
-   "foto_grande": "fotos/f560e4200faa4a57a0166b00a2d2578f.jpg"
-  },
-  {
-   "id": 2,
-   "tipo": "Camisa",
-   "color": "Negro",
-   "talla": "L",
-   "notas": "Oversize",
-   "disponible": 3,
-   "foto": "fotos/f560e4200faa4a57a0166b00a2d2578f_m.jpg",
-   "foto_grande": "fotos/f560e4200faa4a57a0166b00a2d2578f.jpg"
-  },
-  {
-   "id": 3,
-   "tipo": "Gorra",
-   "color": "beige",
-   "talla": "Única",
-   "notas": "",
-   "disponible": 3,
-   "foto": "fotos/569575b92a75447bb3d219610c3d7d35_m.jpg",
-   "foto_grande": "fotos/569575b92a75447bb3d219610c3d7d35.jpg"
-  }
- ]
+ "pagina": "b78696cac9",
+ "prendas": []
 }
